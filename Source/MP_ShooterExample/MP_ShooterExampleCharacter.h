@@ -16,56 +16,62 @@ struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
-UCLASS(config=Game)
+UCLASS(config = Game)
 class AMP_ShooterExampleCharacter : public ACharacter
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
-	/** Pawn mesh: 1st person view (arms; seen only by self) */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Mesh, meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* Mesh1P;
+    /** Pawn mesh: 1st person view (arms; seen only by self) */
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))
+    USkeletalMeshComponent *Mesh1P;
 
-	/** First person camera */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* FirstPersonCameraComponent;
+    /** First person camera */
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+    UCameraComponent *FirstPersonCameraComponent;
 
-	/** Jump Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
-	UInputAction* JumpAction;
+    /** Jump Input Action */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+    UInputAction *JumpAction;
 
-	/** Move Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
-	UInputAction* MoveAction;
-	
-public:
-	AMP_ShooterExampleCharacter();
+    /** Move Input Action */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+    UInputAction *MoveAction;
 
-protected:
-	virtual void BeginPlay();
+  public:
+    AMP_ShooterExampleCharacter();
 
-public:
-		
-	/** Look Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* LookAction;
+  protected:
+    virtual void BeginPlay();
 
-protected:
-	/** Called for movement input */
-	void Move(const FInputActionValue& Value);
+  public:
+    /** Look Input Action */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+    class UInputAction *LookAction;
 
-	/** Called for looking input */
-	void Look(const FInputActionValue& Value);
+  protected:
+    /** Called for movement input */
+    void Move(const FInputActionValue &Value);
 
-protected:
-	// APawn interface
-	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
-	// End of APawn interface
+    /** Called for looking input */
+    void Look(const FInputActionValue &Value);
 
-public:
-	/** Returns Mesh1P subobject **/
-	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
-	/** Returns FirstPersonCameraComponent subobject **/
-	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
+  protected:
+    // APawn interface
+    virtual void SetupPlayerInputComponent(UInputComponent *InputComponent) override;
+    // End of APawn interface
 
+  public:
+    /** Returns Mesh1P subobject **/
+    USkeletalMeshComponent *GetMesh1P() const { return Mesh1P; }
+    /** Returns FirstPersonCameraComponent subobject **/
+    UCameraComponent *GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
+
+    UFUNCTION(BlueprintCallable)
+    void OpenLobby();
+
+    UFUNCTION(BlueprintCallable)
+    void CallOpenLevel(const FString &IPAdress);
+
+    UFUNCTION(BlueprintCallable)
+    void CallClientTravel(const FString &IPAdress);
 };
-
