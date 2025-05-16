@@ -74,4 +74,8 @@ class AMP_ShooterExampleCharacter : public ACharacter
 
     UFUNCTION(BlueprintCallable)
     void CallClientTravel(const FString &IPAdress);
+    
+    //Online related
+    public:
+    TSharedPtr<class IOnlineSession, ESPMode::ThreadSafe> OnlineSessionPtr;
 };

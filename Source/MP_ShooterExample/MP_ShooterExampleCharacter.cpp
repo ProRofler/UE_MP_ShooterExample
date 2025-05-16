@@ -13,6 +13,8 @@
 
 #include "Kismet/GameplayStatics.h"
 
+#include "OnlineSubsystem.h"
+
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 //////////////////////////////////////////////////////////////////////////
@@ -36,6 +38,20 @@ AMP_ShooterExampleCharacter::AMP_ShooterExampleCharacter()
     Mesh1P->CastShadow = false;
     // Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
     Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
+
+    // online subsystem
+    auto onlineSubsystem = IOnlineSubsystem::Get();
+
+    if (onlineSubsystem)
+    {
+        OnlineSessionPtr = onlineSubsystem->GetSessionInterface();
+        if (GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(
+                -1, 10.f, FColor::Red,
+                FString::Printf(TEXT("Found session: %s"), *onlineSubsystem->GetSubsystemName().ToString()));
+        }
+    }
 }
 
 void AMP_ShooterExampleCharacter::BeginPlay()
@@ -76,7 +92,7 @@ void AMP_ShooterExampleCharacter::OpenLobby()
 {
     if (GetWorld())
     {
-        if (GetWorld()->ServerTravel("/Game/FirstPerson/Maps/FirstPersonMap?listen")) 
+        if (GetWorld()->ServerTravel("/Game/FirstPerson/Maps/FirstPersonMap?listen"))
         {
             GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Blue, TEXT("Loaded level"));
         }
