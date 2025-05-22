@@ -5,6 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+
+#include "Interfaces/OnlineSessionInterface.h"
+
 #include "MP_ShooterExampleCharacter.generated.h"
 
 class UInputComponent;
@@ -60,6 +63,13 @@ class AMP_ShooterExampleCharacter : public ACharacter
     virtual void SetupPlayerInputComponent(UInputComponent *InputComponent) override;
     // End of APawn interface
 
+    // online related
+  protected:
+    UFUNCTION(BlueprintCallable)
+    void CreateGameSession();
+
+    void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
+
   public:
     /** Returns Mesh1P subobject **/
     USkeletalMeshComponent *GetMesh1P() const { return Mesh1P; }
@@ -74,8 +84,10 @@ class AMP_ShooterExampleCharacter : public ACharacter
 
     UFUNCTION(BlueprintCallable)
     void CallClientTravel(const FString &IPAdress);
-    
-    //Online related
-    public:
-    TSharedPtr<class IOnlineSession, ESPMode::ThreadSafe> OnlineSessionPtr;
+
+    // Online related
+  public:
+    IOnlineSessionPtr OnlineSessionPtr;
+
+    FOnCreateSessionCompleteDelegate CreateSessionCompleteDelegate;
 };

@@ -12,6 +12,7 @@
 #include "MP_ShooterExampleProjectile.h"
 
 #include "Kismet/GameplayStatics.h"
+#include "OnlineSessionSettings.h"
 
 #include "OnlineSubsystem.h"
 
@@ -21,6 +22,8 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 // AMP_ShooterExampleCharacter
 
 AMP_ShooterExampleCharacter::AMP_ShooterExampleCharacter()
+    : CreateSessionCompleteDelegate(
+          FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete))
 {
     // Set size for collision capsule
     GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
@@ -50,6 +53,7 @@ AMP_ShooterExampleCharacter::AMP_ShooterExampleCharacter()
             GEngine->AddOnScreenDebugMessage(
                 -1, 10.f, FColor::Red,
                 FString::Printf(TEXT("Found session: %s"), *onlineSubsystem->GetSubsystemName().ToString()));
+            OnlineSessionPtr->AddOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegate);
         }
     }
 }
@@ -85,6 +89,43 @@ void AMP_ShooterExampleCharacter::SetupPlayerInputComponent(UInputComponent *Pla
                TEXT("'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input "
                     "system. If you intend to use the legacy system, then you will need to update this C++ file."),
                *GetNameSafe(this));
+    }
+}
+
+void AMP_ShooterExampleCharacter::CreateGameSession()
+{
+    if (!OnlineSessionPtr.IsValid()) return;
+
+    const auto existingSessionName = OnlineSessionPtr->GetNamedSession(NAME_GameSession);
+
+    if (existingSessionName)
+    {
+        OnlineSessionPtr->DestroySession(NAME_GameSession);
+    }
+    //
+
+    TSharedPtr<FOnlineSessionSettings> SessionSettings = MakeShareable(new FOnlineSessionSettings());
+    SessionSettings->bIsLANMatch = false;
+    SessionSettings->NumPublicConnections = 4;
+    SessionSettings->bAllowJoinInProgress = true;
+    SessionSettings->bAllowJoinViaPresence = true;
+    SessionSettings->bShouldAdvertise = true;
+    SessionSettings->bUsesPresence = true;
+
+    const auto firstLocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
+    OnlineSessionPtr->CreateSession(*firstLocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, *SessionSettings);
+}
+
+void AMP_ShooterExampleCharacter::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful)
+{
+    if (bWasSuccessful)
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green,
+                                         FString::Printf(TEXT("Created session: %s"), *SessionName.ToString()));
+    }
+    else
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, TEXT("Failed to create session"));
     }
 }
 
